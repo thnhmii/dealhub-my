@@ -1,61 +1,201 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deal Hub</title>
+<title>Voucher Hub</title>
 
 <style>
 body{
-  font-family:Arial;
   margin:0;
-  padding:15px;
-  background:#f5f5f5;
+  font-family:Arial, sans-serif;
+  background:transparent; /* NỀN TRONG SUỐT */
 }
 
+.container{
+  max-width:500px;
+  margin:auto;
+  padding:10px;
+}
+
+/* ===== ADMIN PANEL ===== */
+.admin{
+  background:#111;
+  padding:15px;
+  border-radius:14px;
+  margin-bottom:20px;
+  color:white;
+  display:none;
+}
+
+.admin input{
+  width:100%;
+  padding:8px;
+  margin-bottom:8px;
+  border-radius:8px;
+  border:none;
+}
+
+.admin button{
+  width:100%;
+  padding:8px;
+  border:none;
+  border-radius:8px;
+  background:#ff2d6f;
+  color:white;
+  cursor:pointer;
+}
+
+/* ===== VOUCHER CARD ===== */
 .card{
   background:linear-gradient(135deg,#ff2d6f,#ff4b2b);
-  padding:18px;
+  padding:16px;
   border-radius:16px;
   margin-bottom:15px;
   color:white;
-  box-shadow:0 6px 0 #000;
+  box-shadow:0 6px 0 rgba(0,0,0,0.2);
+  transition:0.2s;
+}
+
+.card:hover{
+  transform:translateY(-3px);
 }
 
 .title{
-  font-size:18px;
   font-weight:bold;
+  font-size:16px;
 }
 
 .code{
   margin:10px 0;
+  font-size:14px;
 }
 
-button{
-  background:black;
-  color:white;
+.actions{
+  display:flex;
+  gap:8px;
+}
+
+.actions button{
+  flex:1;
+  padding:6px;
   border:none;
-  padding:8px 12px;
   border-radius:8px;
   cursor:pointer;
+  font-size:13px;
+}
+
+.copyBtn{
+  background:black;
+  color:white;
+}
+
+.openBtn{
+  background:white;
+  color:black;
+}
+
+.deleteBtn{
+  background:#222;
+  color:#ff4b2b;
+  margin-top:8px;
+  width:100%;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-  <div class="title">30% OFF Capped RM25</div>
-  <div class="code"><b>Code:</b> FBSEB2026O5KI3V</div>
-  <button onclick="openVoucher('FBSEB2026O5KI3V')">Mở Link</button>
+<div class="container">
+
+<!-- Nút bật admin -->
+<button onclick="toggleAdmin()" style="margin-bottom:10px;">
+⚙ Admin
+</button>
+
+<!-- Admin panel -->
+<div class="admin" id="adminPanel">
+  <input id="titleInput" placeholder="Tiêu đề voucher">
+  <input id="codeInput" placeholder="Mã voucher">
+  <button onclick="addVoucher()">Thêm voucher</button>
+</div>
+
+<!-- Voucher list -->
+<div id="voucherList"></div>
+
 </div>
 
 <script>
+const STORAGE_KEY = "voucher_data_v1";
+
+let vouchers = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(vouchers));
+}
+
+function toggleAdmin(){
+  const panel = document.getElementById("adminPanel");
+  panel.style.display = panel.style.display === "none" ? "block" : "none";
+}
+
+function addVoucher(){
+  const title = document.getElementById("titleInput").value.trim();
+  const code = document.getElementById("codeInput").value.trim();
+
+  if(!title || !code){
+    alert("Nhập đầy đủ thông tin");
+    return;
+  }
+
+  vouchers.unshift({title, code});
+  save();
+  render();
+
+  document.getElementById("titleInput").value="";
+  document.getElementById("codeInput").value="";
+}
+
+function deleteVoucher(index){
+  if(confirm("Xóa voucher này?")){
+    vouchers.splice(index,1);
+    save();
+    render();
+  }
+}
+
+function copyCode(code){
+  navigator.clipboard.writeText(code);
+  alert("Đã copy: " + code);
+}
+
 function openVoucher(code){
   navigator.clipboard.writeText(code);
   window.open("https://shopee.com.my/user/voucher-wallet","_blank");
-  alert("Đã copy mã: " + code + "\\nDán vào Add Voucher rồi nhấn Enter.");
 }
+
+function render(){
+  let html="";
+  vouchers.forEach((v,index)=>{
+    html += `
+      <div class="card">
+        <div class="title">${v.title}</div>
+        <div class="code"><b>Code:</b> ${v.code}</div>
+
+        <div class="actions">
+          <button class="copyBtn" onclick="copyCode('${v.code}')">Copy</button>
+          <button class="openBtn" onclick="openVoucher('${v.code}')">Open</button>
+        </div>
+
+        <button class="deleteBtn" onclick="deleteVoucher(${index})">Xóa</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("voucherList").innerHTML = html;
+}
+
+render();
 </script>
 
 </body>
