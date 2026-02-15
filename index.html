@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal Hub</title>
+
+<style>
+body{
+  font-family:Arial;
+  margin:0;
+  padding:15px;
+  background:#f5f5f5;
+}
+
+.card{
+  background:linear-gradient(135deg,#ff2d6f,#ff4b2b);
+  padding:18px;
+  border-radius:16px;
+  margin-bottom:15px;
+  color:white;
+  box-shadow:0 6px 0 #000;
+}
+
+.title{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.code{
+  margin:10px 0;
+}
+
+button{
+  background:black;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="title">30% OFF Capped RM25</div>
+  <div class="code"><b>Code:</b> FBSEB2026O5KI3V</div>
+  <button onclick="openVoucher('FBSEB2026O5KI3V')">Mở Link</button>
+</div>
+
+<script>
+function openVoucher(code){
+  navigator.clipboard.writeText(code);
+  window.open("https://shopee.com.my/user/voucher-wallet","_blank");
+  alert("Đã copy mã: " + code + "\\nDán vào Add Voucher rồi nhấn Enter.");
+}
+</script>
+
+</body>
+</html>
